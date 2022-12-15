@@ -6,7 +6,7 @@
 
 After cloning the repo, the easiest way to install all the dependencies is via opam:
 ```
-git clone https://github.com/gbdrt/byo-ppl
+git clone https://github.com/mpri-probprog/byo-ppl-22-23.git
 cd byo-ppl
 opam install . --deps-only
 ```
