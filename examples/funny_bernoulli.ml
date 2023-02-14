@@ -35,3 +35,9 @@ let _ =
   let dist = Infer.Importance_sampling.infer funny_bernoulli () in
   let { values; probs; _ } = get_support ~shrink:true dist in
   Array.iteri (fun i x -> Format.printf "%d %f@." x probs.(i)) values
+
+let _ =
+  Format.printf "@.-- Funny Bernoulli, CPS Importance Sampling --@.";
+  let dist = Infer.Exact_sampling.infer funny_bernoulli () in
+  let { values; probs; _ } = get_support ~shrink:true dist in
+  Array.iteri (fun i x -> Format.printf "%d %f@." x probs.(i)) values

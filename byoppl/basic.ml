@@ -9,8 +9,6 @@ type _ Effect.t += Sample : 'a Distribution.t -> 'a t
 module Rejection_sampling = struct
 
   type prob = Prob
-
-  exception Reject
   
   let infer ?(n=1000) model data = 
     let rec exec i = try_with model data

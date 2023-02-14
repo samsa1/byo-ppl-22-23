@@ -221,8 +221,8 @@ module Metropolis_hasting = struct
           match eff with
           | Sample d -> Some (fun k -> sample d (from_cont k) prob)
           | Factor s -> Some (fun k -> factor s (from_cont k) prob)
-          | Assume p -> Some(fun k -> factor (if p then 0. else -. infinity) (from_cont k) prob)
-          | Observe (d, v) -> Some(fun k -> factor (Distribution.logpdf d v) (from_cont k) prob)
+          | Assume p -> Some(fun k -> assume p (from_cont k) prob)
+          | Observe (d, v) -> Some(fun k -> observe d v (from_cont k) prob)
           | _ -> None
       } in
     let values =
@@ -230,4 +230,84 @@ module Metropolis_hasting = struct
       Array.sub a warmup n
     in
     Distribution.uniform_support ~values
+end
+
+
+module Exact_sampling = struct
+  type 'a prob = {
+    mutable trace : 'a particle list;
+    mutable current_score : float;
+    mutable values : ('a, float) Hashtbl.t;
+  }
+
+  and 'a particle =
+    | Particle : {
+        k : 'b -> unit;
+        score : float;
+        values : ('b * float) list;
+      }
+        -> 'a particle
+
+  exception FeatureNotSupported
+
+  let from_cont k = fun v -> continue (Multicont.Deep.clone_continuation k) v
+
+  let rec restart prob =
+    match prob.trace with
+      | [] -> ()
+      | (Particle regen)::trace -> begin
+        prob.trace <- trace;
+        match regen.values with
+          | [] -> restart prob
+          | (v, s)::values -> begin
+            let k = regen.k in
+            prob.current_score <- regen.score +. s;
+            let regen = Particle { regen with values } in
+            prob.trace <- regen :: prob.trace;
+            k v
+          end
+      end
+
+  let sample dist k prob =
+    let values = (Distribution.get_support dist).values |> Array.to_list in
+    let values = List.map (fun v -> (v, Distribution.logpdf dist v)) values in
+    match values with
+      | [] -> restart prob
+      | (v, s)::values ->
+          let particle = Particle { k; score = prob.current_score; values } in
+          prob.trace <- particle :: prob.trace;
+          prob.current_score <- prob.current_score +. s;
+          k v
+
+  let assume p k prob =
+    if p
+    then continue k ()
+    else begin
+      restart prob
+    end
+
+  let exit v prob =
+    Hashtbl.add prob.values v prob.current_score;
+    restart prob
+
+  let infer ?(n = 1000) m data =
+    let prob = {
+          trace = [];
+          current_score = 0.;
+          values = Hashtbl.create n;
+        } in
+    let () = try_with
+        (fun () -> exit (m data) prob) ()
+      {
+        effc = fun (type a) (eff: a t) ->
+          match eff with
+          | Sample d -> Some (fun k -> sample d (from_cont k) prob)
+          | Factor _ -> Some (fun k -> discontinue k FeatureNotSupported)
+          | Assume p -> Some(fun k -> assume p k prob)
+          | Observe _ -> Some (fun k -> discontinue k FeatureNotSupported)
+          | _ -> None
+      } in
+    let values = prob.values |> Utils.Hashtbl.to_array_keys in
+    let logits = prob.values |> Utils.Hashtbl.to_array_values in
+    Distribution.support ~values ~logits
 end
