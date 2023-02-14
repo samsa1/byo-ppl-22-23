@@ -1,4 +1,4 @@
-(lang dune 2.9)
+(lang dune 3.6)
 (name byo-ppl)
 (authors "MPRI 2022-2023")
 (maintainers "Guillaume Baudart (guillaume.baudart@inria.fr)")
@@ -9,7 +9,7 @@
  (name byo-ppl)
  (synopsis "Build Your Own Probabilistic Programming Language")
  (depends
-  (dune (>= 2.9))
+  (dune (>= 3.6))
   (owl (>= 1.0))
  )
 )

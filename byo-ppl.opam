@@ -6,7 +6,7 @@ authors: ["MPRI 2022-2023"]
 homepage: "https://github.com/mpri-probprog/byo-ppl-22-23"
 bug-reports: "https://github.com/mpri-probprog/byo-ppl-22-23/issues"
 depends: [
-  "dune" {>= "2.9" & >= "2.9"}
+  "dune" {>= "3.6" & >= "3.6"}
   "owl" {>= "1.0"}
   "odoc" {with-doc}
 ]
@@ -19,10 +19,8 @@ build: [
     name
     "-j"
     jobs
-    "--promote-install-files=false"
     "@install"
     "@runtest" {with-test}
     "@doc" {with-doc}
   ]
-  ["dune" "install" "-p" name "--create-install-files" name]
 ]
