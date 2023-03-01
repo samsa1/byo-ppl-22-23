@@ -9,6 +9,7 @@ depends: [
   "dune" {>= "3.6" & >= "3.6"}
   "owl" {>= "1.0"}
   "odoc" {with-doc}
+  "multicont"
 ]
 build: [
   ["dune" "subst"] {dev}
