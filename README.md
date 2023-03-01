@@ -2,11 +2,21 @@
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gbdrt/byo-ppl/HEAD)
 
+## Using OCaml 5
+
+Create a switch with ocaml 5 :
+
+```
+opam switch create 5.0.0~rc1
+````
+
+You can then follow the normal procedure.
+
 ## Install
 
 After cloning the repo, the easiest way to install all the dependencies is via opam:
 ```
-git clone https://github.com/mpri-probprog/byo-ppl-22-23.git
+git clone https://github.com/samsa1/byo-ppl-22-23.git
 cd byo-ppl
 opam install . --deps-only
 ```
