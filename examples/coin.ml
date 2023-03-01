@@ -2,7 +2,6 @@ open Effect
 open Byoppl
 open Distribution
 open Basic
-open Basic.Rejection_sampling
 
 let coin data =
   let z = perform (Sample (uniform ~a:0. ~b:1.)) in
@@ -11,7 +10,7 @@ let coin data =
 
 let _ =
   Format.printf "@.-- Coin, Basic Rejection Sampling --@.";
-  let dist = infer coin [ 0; 1; 1; 0; 0; 0; 0; 0; 0; 0 ] in
+  let dist = Basic.Rejection_sampling.infer coin [ 0; 1; 1; 0; 0; 0; 0; 0; 0; 0 ] in
   let m, s = Distribution.stats dist in
   Format.printf "Coin bias, mean: %f std:%f@." m s
 
